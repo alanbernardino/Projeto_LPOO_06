@@ -1,17 +1,23 @@
-<%-- 
-    Document   : home
-    Created on : 25/05/2019, 19:21:26
-    Author     : Alan_Bernardino
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Página Inicial - PIADAS</title>
+        <style>
+            #logo {
+                max-width:70%;
+                max-height:70%;
+                position:absolute;
+                top:10%; left:0; right:0; bottom:0;
+                margin:auto;
+            }
+        </style>
     </head>
     <body>
-        <h1>Hell_World!!!</h1>
+        <%@include file="WEB-INF/header.jspf"%>
+
+        <main role="main" class="container">
+            <img src="<%= path%>/resources/imagens/logo.png" class="img-fluid mt-5" id="logo"/>
+        </main>
+
+        <%@include file="WEB-INF/footer.jspf"%>
     </body>
 </html>
