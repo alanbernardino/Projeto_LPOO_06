@@ -1,25 +1,55 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- * Author:  Alan_Bernardino
- * Created: 25/05/2019
- */
-
-DROP TABLE USERS;
-CREATE TABLE USERS(
-    ID BIGINT NOT NULL PRIMARY KEY
-        GENERATED ALWAYS AS IDENTITY
-        (START WITH 1, INCREMENT BY 1)
-    ,ROLE VARCHAR (200) NOT NULL    
-    ,NAME VARCHAR (200) NOT NULL    
-    ,LOGIN VARCHAR (20) NOT NULL    
-    ,PASSWORDHASH BIGINT NOT NULL
+-- Tabela de usuários --
+DROP TABLE USUARIO;
+CREATE TABLE USUARIO(
+    ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    TIPO VARCHAR (200) NOT NULL,
+    NOME VARCHAR (200) NOT NULL,
+    LOGIN VARCHAR (20) NOT NULL UNIQUE,
+    SENHA VARCHAR (32) NOT NULL
 );
 
-INSERT INTO USERS VALUES
-(DEFAULT, 'PIADMIN', 'Piadministrador', 'piadmin', 12345678);
-INSERT INTO USERS VALUES
-(DEFAULT, 'BESTA', 'Piadista', 'besta', 12345678);
+-- Inserção de usuários --
+INSERT INTO USUARIO VALUES
+(DEFAULT, 'ADMIN', 'Piadministrador', 'piadmin', '1509442');
+INSERT INTO USUARIO VALUES
+(DEFAULT, 'USUARIO', 'Piadista', 'besta', '1509442');
+
+
+-- Tabela de piadas --
+DROP TABLE PIADA;
+CREATE TABLE PIADA(
+    ID BIGINT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    TEXTO VARCHAR (200) NOT NULL,
+    AUTOR BIGINT NOT NULL,
+    PENDENTE BOOLEAN NOT NULL,
+    REJEITADA BOOLEAN NOT NULL
+);
+
+-- Inserção de piadas --
+INSERT INTO PIADA VALUES (
+    DEFAULT, 
+    'Era uma vez um pintinho que não tinha cu, um dia foi peidar e explodiu!', 
+    (SELECT ID FROM USUARIO WHERE LOGIN = 'besta'), 
+    true,
+    false);
+
+INSERT INTO PIADA VALUES (
+    DEFAULT, 
+    'Qual a fórmula da água benta? H DEUS Ó!', 
+    (SELECT ID FROM USUARIO WHERE LOGIN = 'besta'), 
+    true,
+    false);
+
+-- Tabela de piadas avaliadas --
+DROP TABLE AVALIADA;
+CREATE TABLE AVALIADA(
+    ID BIGINT NOT NULL,
+    AVALIADOR BIGINT NOT NULL,
+    AVALIACAO BOOLEAN NOT NULL,
+    PRIMARY KEY (ID, AVALIADOR)
+);
+
+INSERT INTO AVALIADA VALUES (
+    (SELECT ID FROM PIADA WHERE TEXTO = 'Qual a fórmula da água benta? H DEUS Ó!'), 
+    (SELECT ID FROM USUARIO WHERE LOGIN = 'besta'), 
+    true);
