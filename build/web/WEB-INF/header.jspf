@@ -1,0 +1,103 @@
+<%@page import="br.com.fatecpg.piadas.web.Piada"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="br.com.fatecpg.piadas.web.Usuario"%>
+<%
+    String path = request.getContextPath();
+    if (request.getParameter("logar") != null) {
+        String login = request.getParameter("login");
+        String senha = request.getParameter("senha");
+        Usuario usuarioHeader = null;
+        try {
+            usuarioHeader = Usuario.logar(login, senha);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (usuarioHeader == null) {
+%>
+<script>alert("Usuário e/ou senha inválido(s)!");</script>
+<%
+        } else {
+            session.setAttribute("usuario", usuarioHeader);
+            response.sendRedirect(request.getRequestURI());
+        }
+    }
+    if (request.getParameter("logout") != null) {
+        session.removeAttribute("usuario");
+        response.sendRedirect(request.getRequestURI());
+    }
+%>
+
+<style>
+    body {
+        background-image: url(<%= path%>/resources/imagens/patternBg.png);
+        background-repeat: round;
+        background-size: 7%;
+    }
+</style>
+<%@include file="/resources/vendor.jspf"%>
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="<%= path%>/home.jsp">Trocadalhos e piadolas <img src="<%= path %>/resources/imagens/logo.png" width="40px" /></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse ml-5" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="<%= path%>/home.jsp">HOME</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="<%= path%>/perfil/perfil.jsp">PERFIL</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="<%= path%>/piada/piadas.jsp">PIADAS</a>
+                </li>
+                <%
+                    if (session.getAttribute("usuario") != null) {
+
+                        Usuario usuarioAdmin = (Usuario) session.getAttribute("usuario");
+                        if (usuarioAdmin.getTipo().equalsIgnoreCase("ADMIN")) {
+                            ArrayList<Piada> piadas = new ArrayList<Piada>();
+                            piadas = Piada.getPiadasPendentes();
+                            int piadasPendentesDeAprovacao = 0;
+                            if (piadas != null) {
+                                piadasPendentesDeAprovacao = piadas.size();
+                            } else {
+                                piadasPendentesDeAprovacao = 0;
+                            }
+
+                %>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="<%= path%>/admin/pendentes.jsp">PENDENTES <%= piadasPendentesDeAprovacao > 0 ? "<span class='badge badge-pill badge-danger'>" + piadasPendentesDeAprovacao + "</span>" : ""%></a>
+                </li>
+                <%
+                        }
+                    }
+                %>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <%
+                    if (session.getAttribute("usuario") == null) {
+                %>
+                <form method="post" class="form-inline my-2 my-lg-0 p-2">
+                    <input name="login" class="form-control mr-sm-2" type="text" placeholder="Usuário" aria-label="Usuário" required="">
+                    <input name="senha" class="form-control mr-sm-2" type="password" placeholder="Senha" aria-label="Senha" required="">
+                    <button name="logar" class="btn btn-outline-success my-2 my-sm-0" type="submit">Entrar</button>
+                </form>
+                <%
+                } else {
+                %>
+                <form method="post" class="form-inline my-2 my-lg-0">
+                    <% Usuario usuarioNavbar = (Usuario) session.getAttribute("usuario");%>
+                    <span class="navbar-text p-3">
+                        Bem vindo, <%= usuarioNavbar.getNome()%>
+                    </span>
+                    <button name="logout" class="btn btn-outline-danger my-2 my-sm-0" type="submit">Sair</button>
+                </form>
+                <%
+                    }
+                %>
+            </ul>
+        </div>
+    </nav>
+</header>
